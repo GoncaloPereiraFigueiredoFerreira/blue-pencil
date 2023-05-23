@@ -41,5 +41,5 @@ def pdf_to_image(pdf_path, image_path):
     # Loop through each image
     for i, image in enumerate(images):
         # Save the image
-        image.save(image_path + str(i) + '.png', "PNG")
+        image.save(image_path + str(i) + '.jpeg', "JPEG")
  
