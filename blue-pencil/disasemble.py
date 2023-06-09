@@ -24,14 +24,17 @@ def pdf_to_text(pdf_path, text_path):
     reader = PdfReader(pdf_path)
     text = ""
     i=0
+    res =[]
     for page in reader.pages:
         pageTxt = open(text_path+str(i)+".txt","w")
+        res.append(text_path+str(i)+".txt")
         i+=1
         text = page.extract_text()
         text = latinCompability(text)
         pageTxt.write(text)
         pageTxt.close()
-
+       
+    return res
 
 #Could have used pdftocairo
 def pdf_to_image(pdf_path, image_path):
@@ -41,5 +44,5 @@ def pdf_to_image(pdf_path, image_path):
     # Loop through each image
     for i, image in enumerate(images):
         # Save the image
-        image.save(image_path + str(i) + '.jpeg', "JPEG")
+        image.save(image_path + str(i) + '.png')
  
