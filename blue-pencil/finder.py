@@ -31,7 +31,8 @@ def find_entities(text):
 
         # TODO: add more labels
         elif w.pos_ == 'PROPN':
-            res.append((w.text, (length, length + len(w.text), w.pos_)))
+            #res.append((w.text, (length, length + len(w.text), w.pos_)))
+            pass
         elif w.pos_ == 'NUM':
             res.append((w.text, (length, length + len(w.text)), w.pos_))
         #elif w.ent_type_ != '':
@@ -39,6 +40,7 @@ def find_entities(text):
             #print('entity found: ' + w.text + ' | ' + str(w.ent_type_))
         length += len(w.text)
         length += len(w.whitespace_)
+    return res
 
 #rfile = open('test', 'r')
 #text = rfile.read()

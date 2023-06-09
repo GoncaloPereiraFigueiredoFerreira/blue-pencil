@@ -3,7 +3,7 @@ import cv2
 import pytesseract
 import re
 
-def blue_marker(private,image,lang):
+def blue_marker(private,image):
 
     # Mention the installed location of Tesseract-OCR in your system
     #pytesseract.pytesseract.tesseract_cmd = 'System_path_to_tesseract.exe'
@@ -33,13 +33,19 @@ def blue_marker(private,image,lang):
 
         # TODO: localize more than one word and aggregate rectangles
         text = results["text"][i]
-        if re.search("projeto",text,re.I,) :
-            conf = int(results["conf"][i])
-            print("Confidence: {}".format(conf))
-            print("Text: {}".format(text))
-            text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0,0),-1)
+
+        for i in private: 
+
+            if re.search(i[0],text,re.I):
+                text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
+                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0,0),-1)
+                cv2.putText(img,"Anon",(x, y + int(3*h/4)),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+
+
+
+        
 
 
     # show the output image
     cv2.imwrite(image,img)
+
