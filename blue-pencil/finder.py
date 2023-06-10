@@ -39,7 +39,3 @@ def find_entities(text):
         length += len(w.whitespace_)
     #print(res)
     return res
-
-rfile = open('test', 'r')
-text = rfile.read()
-find_entities(text)
