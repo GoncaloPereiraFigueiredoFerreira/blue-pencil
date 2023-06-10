@@ -5,6 +5,7 @@ nlp = spacy.load("pt_core_news_lg")
 
 import re
 morada = ('morada...', r'(Avenida|Rua|Tv\.|Trv\.|Travessa)(\s(d[eao]s?\s)?([A-Z]\w+(\.)?))*(\s[nN](º)?\d+)?')
+data = ('data...', r'\d\d?\s*(de)?\s*(jan(eiro)?|fev(ereiro)?|mar(c|ço)?|abr(il)?|mai(o)?|jun(ho)?|jul(ho)?|ago(sto)?|set(embro)?|out(ubro)?|nov(embro)?|dez(embro)?)(\s*(de)?\s*\d{2,4})?')
 exps = [('email...', r'[a-zA-Z](\w)*@[a-zA-Z](\w)*\.[a-zA-Z](\w)*'), 
         ('código postal...', r'\d{4}-\d{3}'), 
         ('NSS...', r'\d{11}'), 
@@ -15,7 +16,6 @@ exps = [('email...', r'[a-zA-Z](\w)*@[a-zA-Z](\w)*\.[a-zA-Z](\w)*'),
         ('twitter...', r'@\w*'),
         ('www...', r'(http(s)?:\/\/)?(www\.)?[a-zA-z0-9]+\.[a-z]{2,3}(\/[a-zA-z0-9]+)?(\/)?')]
 # telemóvel, NIF e NUS têm o mesmo número de dígitos
-
 
 def find_entities(text, extra_patterns):
     res = []
@@ -30,9 +30,21 @@ def find_entities(text, extra_patterns):
                 res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), extra_patterns[i][1]))
                 break
 
-        match = re.search(morada[1], line)
-        if match:
-            res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), morada[0]))
+        match = 1
+        tmp_line = line
+        while match:
+            match = re.search(morada[1], line, flags=re.IGNORECASE)
+            if match and match != 1:
+                res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), morada[0]))
+                tmp_line = re.sub(morada[1], r'', tmp_line, count=1, flags=re.IGNORECASE)
+
+        match = 1
+        tmp_line = line
+        while match:
+            match = re.search(data[1], tmp_line)
+            if match and match != 1:
+                res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), data[0]))
+                tmp_line = re.sub(data[1], r'', tmp_line, count=1, flags=re.IGNORECASE)
 
         words = line.split()
         for w in words:
@@ -44,14 +56,12 @@ def find_entities(text, extra_patterns):
 
         doc = nlp(line)
         for w in doc.ents:           
-            if w.label_ in ['PER','GPE']:
-                res = add_detection(res, (w.text, (length, length + len(w.text)), w.label_))
-            length += len(w.text)
+            if w.label_ in ['PER','GPE', 'ORG']:
+                start = w.start_char-w.sent.start_char
+                end = w.end_char-w.sent.start_char
+                res = add_detection(res, (w.text, (length + start, length + end), w.label_))
 
-        length += 1
-
-    for r in res:
-        print(r)
+        length += len(line) + 1
 
     return res
 
