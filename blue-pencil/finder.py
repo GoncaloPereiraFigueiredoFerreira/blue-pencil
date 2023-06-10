@@ -11,7 +11,8 @@ exps = [('email...', r'[a-zA-Z](\w)*@[a-zA-Z](\w)*\.[a-zA-Z](\w)*'),
         ('carta de condução...', r'[A-Z]{1,2}\-\d{6}'), 
         ('data...', r'\d\d?(-|\/|\.)\d\d?(-|\/|\.)\d\d{1,3}'),
         ('twitter...', r'@\w*'),
-        ('www...', r'(http(s)?:\/\/)?(www\.)?[a-zA-z0-9]+\.[a-zA-z0-9]+')]
+        ('www...', r'(http(s)?:\/\/)?(www\.)?[a-zA-z0-9]+\.[a-zA-z0-9]+'),
+        ('morada...',r"(Avenida|Rua|Tv\.|Trv\.|Travessa)(\s(d[eao]s?\s)?([A-Z]\w+(\.)?))*(\s[nN](º)?\d+)?")]
 # TODO: extensão do website, p.ex., www.youtube.com/ (watch?asdsadasdasdas)
 # telemóvel, NIF e NUS têm o mesmo número de dígitos
 
@@ -39,3 +40,13 @@ def find_entities(text):
         length += len(w.whitespace_)
     #print(res)
     return res
+
+def doesntIntersect(array,element): # Element is a pair of (begin,end)
+    elementRange=set([*range(element[0],element[1])])
+    for i in array:
+        irange = set([*range(i[1][0],i[1][1])])
+        if (len(elementRange.intersection(irange))!=0 ):
+            return False
+
+    return True
+
