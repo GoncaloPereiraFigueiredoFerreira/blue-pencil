@@ -14,34 +14,39 @@ def main():
     parser.add_argument("filename", help="Name of the file to be annonimized")    # positional argument
     parser.add_argument("-o", "--outputFile", help="Name of the output file (without extension)", default="output")
     parser.add_argument("-p", "--patterns", help="Name of a file containing patterns to be detected (without extension)")
+    parser.add_argument("-m", "--moreRestrictive", help="Extends entity recognition to include entities that are highly restrictive", action='store_true' )
     args = parser.parse_args()
 
+    extra_patterns = []
     if args.patterns:
         extra_patterns = parse_extraPatterns(args.patterns)
     
     if (args.filename.endswith(".pdf")):
-        processPDF(args.filename)
+        processPDF(args.filename, extra_patterns)
 
     elif args.filename.endswith(".html") or args.filename.endswith(".txt") or args.filename.endswith(".xml") or args.filename.endswith(".md"):
-        processTextF(args.filename)
+        res = processTextF(args.filename, extra_patterns)
     
     else:
         print("File extension not supported!")
 
 
 
-def processTextF(filename):
-    text =  open(filename).read()
-    return finder.find_entities(text)
+def processTextF(filename, extra_patterns):
+    text = open(filename).read()
+    res = finder.find_entities(text, extra_patterns)
+    #for r in res:
+    #    print(r)
+    return res
     
 
-def processPDF(filename):
+def processPDF(filename, extra_patterns):
     imgfiles =disasemble.pdf_to_image(filename,"pdfImages/image")
     txtfiles = disasemble.pdf_to_text(filename,"pdfText/text")
     counter=0
     for txt in txtfiles:
         print(txt)
-        result=processTextF(txt)
+        result=processTextF(txt, extra_patterns)
         find_and_censor.blue_marker(result,"pdfImages/image"+str(counter)+".png")
         counter+=1
 
@@ -54,9 +59,15 @@ def processPDF(filename):
     pdf.output("yourfile.pdf", "F")
 
 def parse_extraPatterns(filename):
+    res = []
     text = open(filename, 'r').read()
     lines = text.split('\n')
-    print(lines)
+    for line in lines:
+        if line != '': 
+            line = line.split(' | ')
+            elem = (r'' + line[0], r'' + line[1])
+            res.append(elem)
+    return res
 
 if __name__ == '__main__':
     # execute only if run as the entry point into the program
