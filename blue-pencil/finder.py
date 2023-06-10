@@ -40,6 +40,4 @@ def find_entities(text):
     #print(res)
     return res
 
-rfile = open('test', 'r')
-text = rfile.read()
-find_entities(text)
+
