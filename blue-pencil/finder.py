@@ -43,12 +43,11 @@ def find_entities(text, extra_patterns):
                     break
 
         doc = nlp(line)
-        for w in doc:
-            # TODO: verificar flag para entidades restritivas
-            if w.ent_type_ in ['PER', 'ORG', 'GPE']:
-                res = add_detection(res, (w.text, (length, length + len(w.text)), w.ent_type_))
+        for w in doc.ents:           
+            if w.label_ in ['PER','GPE']:
+                res = add_detection(res, (w.text, (length, length + len(w.text)), w.label_))
             length += len(w.text)
-            length += len(w.whitespace_)
+
         length += 1
 
     for r in res:
@@ -62,7 +61,7 @@ def add_detection(l, elem):
         l.append(elem)
     return l
 
-def doesntIntersect(array,element): # Element is a pair of (begin,end)
+def doesntIntersect(array,element): 
     elementRange=set([*range(element[0],element[1])])
     for i in array:
         irange = set([*range(i[1][0],i[1][1])])

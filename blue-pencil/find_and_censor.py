@@ -3,12 +3,25 @@ import cv2
 import pytesseract
 import re
 
+ents = {}
+
 def blue_markerText(private,text,replace):
-    for i in private:
-        print(i)
-        if i[0]!="foo(int" and i[0]!="pg50404)Rui" and (i[2]!="MISC"):
+    global ents
+    if replace:
+        for i in private:
+            if (i[2] in ents):
+                if i[0] not in ents[i[2]]:ents[i[2]].append(i[0])
+                index=ents[i[2]].index(i[0])
+            else: 
+                ents[i[2]]=[i[0]]
+                index=0
+
+            text=re.sub(re.escape(i[0]).replace("\ "," "),"#"+i[2]+str(index),text,count=1)
+
+    else:
+        for i in private:         
             censor=["*" for n in range(0,len(i[0]))]
-            text=re.sub(i[0],"".join(censor),text,count=1)
+            text=re.sub(re.escape(i[0]).replace("\ "," "),"".join(censor),text,count=1)
     return text
 
 
@@ -29,31 +42,32 @@ def blue_markerPDF(private,image,replace):
 
     #Should be changed to configure by argument passing
     results = pytesseract.image_to_data(gray, output_type=pytesseract.Output.DICT,config="-l Latin")
+    
+    for i in private: 
+        match =re.escape(i[0]).replace("\ "," ")
+        words =re.split(r"\s",match)
 
+        boxes=[]
+        for j in range(0, len(results["text"])):
+            token=results["text"][j]
+            if re.search(words[len(boxes)],token):
+                boxes.append({"left":results["left"][j],"top":results["top"][j],"width":results["width"][j],"height":results["height"][j]})
+            else:
+                boxes = []
+            if len(boxes)==len(words):
+                break
+        if boxes!=[]:
+            w= 0
+            x= boxes[0]["left"]
+            y= boxes[0]["top"]
+            h= boxes[0]["height"]
+            for box in boxes[1:]:
+                x = box["left"] if x > box["left"] else x
+                y = box["top"]  if y > box["top"] else y
+                w += box["width"] + 10
+                h = box["height"] if h > box["height"] else h
 
-    for i in range(0, len(results["text"])):
-        # extract the bounding box coordinates of the text region from
-        # the current result
-        x = results["left"][i]
-        y = results["top"][i]
-        w = results["width"][i]
-        h = results["height"][i]
-        # extract the OCR text itself along with the confidence of the
-        # text localization
-
-        # TODO: localize more than one word and aggregate rectangles
-        text = results["text"][i]
-
-        for i in private: 
-            print(i)
-            if  i[0]!="foo(int" and i[0]!="pg50404)Rui" and i[2]!="MISC" and re.search(i[0],text):
-                text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
-                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0,0),-1)
-                cv2.putText(img,"Anon",(x, y + int(3*h/4)),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
-
-
-
-        
+            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0,0),-1)
 
 
     # show the output image
