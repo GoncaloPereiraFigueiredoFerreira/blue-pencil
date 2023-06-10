@@ -3,7 +3,17 @@ import cv2
 import pytesseract
 import re
 
-def blue_marker(private,image):
+def blue_markerText(private,text,replace):
+    for i in private:
+        print(i)
+        if i[0]!="pg50404)Rui" and (i[1][2]!="MISC"):
+            censor=["*" for n in range(0,len(i[0]))]
+            text=re.sub(i[0],"".join(censor),text,count=1)
+    return text
+
+
+
+def blue_markerPDF(private,image,replace):
 
     # Mention the installed location of Tesseract-OCR in your system
     #pytesseract.pytesseract.tesseract_cmd = 'System_path_to_tesseract.exe'

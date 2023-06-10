@@ -14,35 +14,53 @@ def main():
     parser.add_argument("filename", help="Name of the file to be annonimized")    # positional argument
     parser.add_argument("-o", "--outputFile", help="Name of the output file (without extension)", default="output")
     parser.add_argument("-p", "--patterns", help="Name of a file containing patterns to be detected (without extension)")
+    parser.add_argument("-p2t","--pdf2text", help="Flag that indicates if pdf should be turned into .txt", action='store_true')
+    parser.add_argument("-r", "--replace",help= "Flag that indicates that the program should replace entities found",default=False ,action='store_true')
+    
     args = parser.parse_args()
-
     if args.patterns:
         extra_patterns = parse_extraPatterns(args.patterns)
     
-    if (args.filename.endswith(".pdf")):
-        processPDF(args.filename)
+    if (args.filename.endswith(".pdf") and args.pdf2text):
+        processPDF2Text(args.filename,args.replace)
+
+    elif (args.filename.endswith(".pdf")):
+        processPDF(args.filename,args.replace)
 
     elif args.filename.endswith(".html") or args.filename.endswith(".txt") or args.filename.endswith(".xml") or args.filename.endswith(".md"):
-        processTextF(args.filename)
+        processTextF(args.filename,args.replace)
     
     else:
         print("File extension not supported!")
 
 
 
-def processTextF(filename):
+def processTextF(filename,replace):
     text =  open(filename).read()
-    return finder.find_entities(text)
-    
+    ents=finder.find_entities(text)
+    output = find_and_censor.blue_markerText(ents,text,replace)
+    open("output.txt","w").write(output)
 
-def processPDF(filename):
+
+def processPDF2Text(filename,replace):
+    txtfiles = disasemble.pdf_to_text(filename,"pdfText/text")
+    output=""
+    counter=0
+    for txt in txtfiles:
+        text =  open(txt).read()
+        result=finder.find_entities(text)
+        output+= find_and_censor.blue_markerText(result,text,replace)
+        counter+=1
+    open("output.txt","w").write(output)
+
+def processPDF(filename,replace):
     imgfiles =disasemble.pdf_to_image(filename,"pdfImages/image")
     txtfiles = disasemble.pdf_to_text(filename,"pdfText/text")
     counter=0
     for txt in txtfiles:
         print(txt)
-        result=processTextF(txt)
-        find_and_censor.blue_marker(result,"pdfImages/image"+str(counter)+".png")
+        result=finder.find_entities(txt)
+        find_and_censor.blue_markerPDF(result,"pdfImages/image"+str(counter)+".png",replace)
         counter+=1
 
     from fpdf import FPDF
