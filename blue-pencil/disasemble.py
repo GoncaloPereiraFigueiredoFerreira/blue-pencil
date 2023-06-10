@@ -40,9 +40,11 @@ def pdf_to_text(pdf_path, text_path):
 def pdf_to_image(pdf_path, image_path):
     # Convert the PDF to a list of PIL images
     images = convert_from_path(pdf_path)
- 
+    paths=[]
     # Loop through each image
     for i, image in enumerate(images):
         # Save the image
         image.save(image_path + str(i) + '.png')
+        paths.append(image_path + str(i) + '.png')
+    return paths
  

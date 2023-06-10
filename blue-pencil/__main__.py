@@ -36,7 +36,7 @@ def processTextF(filename):
     
 
 def processPDF(filename):
-    disasemble.pdf_to_image(filename,"pdfImages/image")
+    imgfiles =disasemble.pdf_to_image(filename,"pdfImages/image")
     txtfiles = disasemble.pdf_to_text(filename,"pdfText/text")
     counter=0
     for txt in txtfiles:
@@ -48,9 +48,9 @@ def processPDF(filename):
     from fpdf import FPDF
     pdf = FPDF()
     # imagelist is the list with all image filenames
-    for image in sorted([f for f in os.listdir("pdfImages")]):
+    for image in imgfiles:
         pdf.add_page()
-        pdf.image("pdfImages/"+image,0,0, 210,297)
+        pdf.image(image,0,0, 210,297)
     pdf.output("yourfile.pdf", "F")
 
 def parse_extraPatterns(filename):
