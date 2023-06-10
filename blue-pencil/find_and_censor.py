@@ -6,7 +6,7 @@ import re
 def blue_markerText(private,text,replace):
     for i in private:
         print(i)
-        if i[0]!="pg50404)Rui" and (i[1][2]!="MISC"):
+        if i[0]!="foo(int" and i[0]!="pg50404)Rui" and (i[2]!="MISC"):
             censor=["*" for n in range(0,len(i[0]))]
             text=re.sub(i[0],"".join(censor),text,count=1)
     return text
@@ -46,7 +46,7 @@ def blue_markerPDF(private,image,replace):
 
         for i in private: 
             print(i)
-            if i[0]!="pg50404)Rui" and i[1][2]!="MISC" and re.search(i[0],text):
+            if  i[0]!="foo(int" and i[0]!="pg50404)Rui" and i[2]!="MISC" and re.search(i[0],text):
                 text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0,0),-1)
                 cv2.putText(img,"Anon",(x, y + int(3*h/4)),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
