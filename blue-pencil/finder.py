@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 
 import spacy
-nlp = spacy.load("pt_core_news_lg")
-
 import re
+
 morada = ('morada...', r'(Avenida|Rua|Tv\.|Trv\.|Travessa)(\s(d[eao]s?\s)?([A-Z]\w+(\.)?))*(\s[nN](º)?\d+)?')
 data = ('data...', r'\d\d?\s*(de)?\s*(jan(eiro)?|fev(ereiro)?|mar(c|ço)?|abr(il)?|mai(o)?|jun(ho)?|jul(ho)?|ago(sto)?|set(embro)?|out(ubro)?|nov(embro)?|dez(embro)?)(\s*(de)?\s*\d{2,4})?')
 exps = [('email...', r'[a-zA-Z](\w)*@[a-zA-Z](\w)*\.[a-zA-Z](\w)*'), 
@@ -17,34 +16,40 @@ exps = [('email...', r'[a-zA-Z](\w)*@[a-zA-Z](\w)*\.[a-zA-Z](\w)*'),
         ('www...', r'(http(s)?:\/\/)?(www\.)?[a-zA-z0-9]+\.[a-z]{2,3}(\/[a-zA-z0-9]+)?(\/)?')]
 # telemóvel, NIF e NUS têm o mesmo número de dígitos
 
-def find_entities(text, extra_patterns):
+def find_entities(text, extra_patterns, restriction, language):
+    if language == 'en':
+        nlp = spacy.load("en_core_web_lg")
+    else:
+        nlp = spacy.load("pt_core_news_lg")
     res = []
     length = 0
     lines = text.split('\n')
 
     for line in lines:
-        exp = -1
+        tmp_line = line
         for i in range(0, len(extra_patterns)):
-            match = re.search(extra_patterns[i][0], line)
-            if match:
+            match = re.search(extra_patterns[i][0], tmp_line)
+            while match:
                 res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), extra_patterns[i][1]))
+                tmp_line = re.sub(extra_patterns[i][0], r'', tmp_line, count=1, flags=re.IGNORECASE)
                 break
 
-        match = 1
-        tmp_line = line
-        while match:
-            match = re.search(morada[1], line, flags=re.IGNORECASE)
-            if match and match != 1:
+        if language == 'pt':
+            match = 1
+            tmp_line = line
+            match = re.search(morada[1], tmp_line, flags=re.IGNORECASE)
+            while match:
                 res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), morada[0]))
                 tmp_line = re.sub(morada[1], r'', tmp_line, count=1, flags=re.IGNORECASE)
+                match = re.search(morada[1], tmp_line, flags=re.IGNORECASE)
 
-        match = 1
-        tmp_line = line
-        while match:
+            match = 1
+            tmp_line = line
             match = re.search(data[1], tmp_line)
-            if match and match != 1:
+            while match:
                 res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), data[0]))
                 tmp_line = re.sub(data[1], r'', tmp_line, count=1, flags=re.IGNORECASE)
+                match = re.search(data[1], tmp_line)
 
         words = line.split()
         for w in words:
@@ -55,11 +60,22 @@ def find_entities(text, extra_patterns):
                     break
 
         doc = nlp(line)
-        for w in doc.ents:           
-            if w.label_ in ['PER','GPE', 'ORG']:
-                start = w.start_char-w.sent.start_char
-                end = w.end_char-w.sent.start_char
+        for w in doc.ents:
+            if restriction == 0:
+                if w.label_ in ['PER', 'PERSON', 'GPE']:
+                    start = w.start_char - w.sent.start_char
+                    end = w.end_char - w.sent.start_char
+                    res = add_detection(res, (w.text, (length + start, length + end), w.label_))
+            elif restriction == 1:
+                if w.label_ in ['PER', 'PERSON', 'GPE', 'ORG']:
+                    start = w.start_char - w.sent.start_char
+                    end = w.end_char - w.sent.start_char
+                    res = add_detection(res, (w.text, (length + start, length + end), w.label_))
+            elif restriction == 2:
+                start = w.start_char - w.sent.start_char
+                end = w.end_char - w.sent.start_char
                 res = add_detection(res, (w.text, (length + start, length + end), w.label_))
+
 
         length += len(line) + 1
 
