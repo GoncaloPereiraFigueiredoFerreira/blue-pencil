@@ -16,7 +16,7 @@ def blue_markerText(private,text,replace):
                 ents[i[2]]=[i[0]]
                 index=0
             if (i[2]!="PER"):
-                text=re.sub(re.escape(i[0]).replace("\ "," "),"#"+i[2]+str(index),text,count=1)
+                text=re.sub(re.escape(i[0]).replace("\ "," "),"#"+i[2]+str(index)+"#",text,count=1)
             else:
                 match = re.search(r"([A-Z])\w+( ([A-Z])\w+)*",i[0])
                 replace=""
@@ -34,10 +34,6 @@ def blue_markerText(private,text,replace):
 
 
 def blue_markerPDF(private,image,replace):
-
-    # Mention the installed location of Tesseract-OCR in your system
-    #pytesseract.pytesseract.tesseract_cmd = 'System_path_to_tesseract.exe'
-
     # Read image from which text needs to be extracted
     img = cv2.imread(image)
 
