@@ -1,6 +1,6 @@
 # blue-pencil
 A python anonymizer tool, capable of censoring names, adresses and other sensitive info.
-
+```
 usage: Blue Pencil [-h] [-o OUTPUTFILE] [-p PATTERNS] [-org] [-m] [-p2t] [-r] [-l LANGUAGE] filename
 
 Python tool capable of censoring files. Works on any text based file and PDFs
@@ -22,6 +22,6 @@ options:
   -r, --replace         Flag that indicates that the program should replace entities found
   -l LANGUAGE, --language LANGUAGE
                         Language of the input file: en or pt
-
+```
 
 Total development report in portguese in the SPLN-Ferramenta_de_Anonimização.pdf file.
