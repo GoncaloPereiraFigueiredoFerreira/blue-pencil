@@ -1,10 +1,20 @@
 [build-system]
-requires = ["flit_core >=3.2,<4","pdf2image","pypdf2"]
+requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
+
 [project]
-name = "pdf_anonymizer"
+name = "blue_pencil"
 authors = [{name = "Gonçalo Ferreira & Rui Braga"}]
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
+dependencies = [
+    "opencv-python",
+    "pytesseract",
+    "spacy",
+    "pdf2image",
+    "pypdf",
+    "argparse",
+    "fpdf"
+]

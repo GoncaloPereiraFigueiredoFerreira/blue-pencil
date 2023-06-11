@@ -16,7 +16,7 @@ def main():
     parser.add_argument("-m", "--moreRestrictive", help="Extends entity recognition to include entities that are highly restrictive", action='store_true' )
     parser.add_argument("-p2t","--pdf2text", help="Flag that indicates if pdf should be turned into .txt", action='store_true')
     parser.add_argument("-r", "--replace",help= "Flag that indicates that the program should replace entities found",default=False ,action='store_true')
-    parser.add_argument("-l","--language",help="Language of the input file: en or pt",default="pt")
+    parser.add_argument("-l", "--language",help="Language of the input file: en or pt",default="pt")
     args = parser.parse_args()
     extra_patterns = []
     if args.patterns:
