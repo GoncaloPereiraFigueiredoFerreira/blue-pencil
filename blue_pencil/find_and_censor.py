@@ -15,8 +15,15 @@ def blue_markerText(private,text,replace):
             else: 
                 ents[i[2]]=[i[0]]
                 index=0
-
-            text=re.sub(re.escape(i[0]).replace("\ "," "),"#"+i[2]+str(index),text,count=1)
+            if (i[2]!="PER"):
+                text=re.sub(re.escape(i[0]).replace("\ "," "),"#"+i[2]+str(index),text,count=1)
+            else:
+                match = re.search(r"([A-Z])\w+( ([A-Z])\w+)*",i[0])
+                replace=""
+                for x in range(len(match.groups())+1):
+                    if x%2==1 and match.group(x)!=None: replace+=match.group(x)+". "
+                replace=replace.removesuffix(" ")+"#"
+                text=re.sub(re.escape(i[0]).replace("\ "," "),"#"+replace,text,count=1)
 
     else:
         for i in private:         

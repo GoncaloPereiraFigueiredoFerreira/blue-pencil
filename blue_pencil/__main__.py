@@ -2,7 +2,7 @@ import argparse
 import disasemble
 import finder
 import find_and_censor
-
+from fpdf import FPDF
 
 
 def main():
@@ -76,7 +76,6 @@ def processPDF(filename, extra_patterns, replace, outputF, restriction, language
         find_and_censor.blue_markerPDF(result,"pdfImages/image"+str(counter)+".png",replace)
         counter+=1
 
-    from fpdf import FPDF
     pdf = FPDF()
     # imagelist is the list with all image filenames
     for image in imgfiles:
