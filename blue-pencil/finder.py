@@ -30,8 +30,10 @@ def find_entities(text, extra_patterns, restriction, language):
         for i in range(0, len(extra_patterns)):
             match = re.search(extra_patterns[i][0], tmp_line)
             while match:
-                res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), extra_patterns[i][1]))
-                tmp_line = re.sub(extra_patterns[i][0], r'', tmp_line, count=1, flags=re.IGNORECASE)
+                start = length + match.span()[0]
+                end = length + match.span()[1]
+                res = add_detection(res, (match.group(0), (start, end), extra_patterns[i][1]))
+                tmp_line = re.sub(extra_patterns[i][0], (end - start)  * '.', tmp_line, count=1, flags=re.IGNORECASE)
                 break
 
         if language == 'pt':
@@ -39,16 +41,20 @@ def find_entities(text, extra_patterns, restriction, language):
             tmp_line = line
             match = re.search(morada[1], tmp_line, flags=re.IGNORECASE)
             while match:
-                res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), morada[0]))
-                tmp_line = re.sub(morada[1], r'', tmp_line, count=1, flags=re.IGNORECASE)
+                start = length + match.span()[0]
+                end = length + match.span()[1]
+                res = add_detection(res, (match.group(0), (start, end), morada[0]))
+                tmp_line = re.sub(morada[1], (end - start)  * '.', tmp_line, count=1, flags=re.IGNORECASE)
                 match = re.search(morada[1], tmp_line, flags=re.IGNORECASE)
 
             match = 1
             tmp_line = line
             match = re.search(data[1], tmp_line)
             while match:
-                res = add_detection(res, (match.group(0), (length + match.span()[0], length + match.span()[1]), data[0]))
-                tmp_line = re.sub(data[1], r'', tmp_line, count=1, flags=re.IGNORECASE)
+                start = length + match.span()[0]
+                end = length + match.span()[1]
+                res = add_detection(res, (match.group(0), (start, end), data[0]))
+                tmp_line = re.sub(data[1], (end - start)  * '.', tmp_line, count=1, flags=re.IGNORECASE)
                 match = re.search(data[1], tmp_line)
 
         words = line.split()
@@ -75,7 +81,6 @@ def find_entities(text, extra_patterns, restriction, language):
                 start = w.start_char - w.sent.start_char
                 end = w.end_char - w.sent.start_char
                 res = add_detection(res, (w.text, (length + start, length + end), w.label_))
-
 
         length += len(line) + 1
 
