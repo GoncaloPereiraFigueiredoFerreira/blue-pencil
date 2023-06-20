@@ -5,6 +5,8 @@ import re
 def latinCompability(text):
     text = re.sub(r"¸ *c","ç",text)
     text = re.sub(r"` *a","à",text)
+    text = re.sub(r"~ *o","õ",text)
+    text = re.sub(r"~ *a","ã",text)
     text = re.sub(r"´ *a","á",text)
     text = re.sub(r"´ *A","Á",text)
     text = re.sub(r"´ *E","É",text)
